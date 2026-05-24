@@ -169,7 +169,7 @@ The correct fix is **query contextualization**. Rewriting the follow-up as a sta
 
 ### Broad Inventory Queries
 
-Questions like "which species in your knowledge base are critically endangered?" require the model to reason across all 15 documents simultaneously. Since retrieval only returns 4 chunks, broad inventory questions may return incomplete answers. A metadata filtering layer — storing conservation status as a ChromaDB metadata field and filtering directly — would resolve this cleanly in a production system.
+Questions like "which species in your knowledge base are critically endangered?" require the model to reason across all 15 documents simultaneously. Since retrieval only returns 4 chunks, broad inventory questions may return incomplete answers. A metadata filtering layer that stores conservation status as a ChromaDB metadata field and filters directly would resolve this cleanly in a production system.
 
 ### Local Model Capability
 
