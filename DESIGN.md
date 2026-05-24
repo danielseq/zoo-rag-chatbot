@@ -54,8 +54,6 @@ Species articles are fetched from Wikipedia using the `wikipedia-api` Python lib
 - **No authentication** — no API keys or rate limiting concerns
 - **Credibility** — Wikipedia conservation articles are well-maintained and widely cited
 
-The initial target source was the IUCN Red List API (the authoritative global standard for conservation status data), but access was blocked by Cloudflare bot protection on v3 and required a separate registration process for v4. Wikipedia provides comparable narrative depth with significantly better programmatic accessibility. For a production system, a combination of both — IUCN for structured status data and Wikipedia for narrative context — would be ideal.
-
 The document library covers 15 species of conservation significance:
 
 - African Elephant, Tiger, Mountain Gorilla, Giant Panda, Amur Leopard
@@ -126,7 +124,7 @@ Never make up species, statistics, or facts not present in the context.
 If you are unsure whether a fact comes from the context or your training, do not include it.
 ```
 
-The strictness of this prompt is intentional. Early testing showed the model blending its parametric knowledge with retrieved content — for example, attributing cultural significance to indigenous communities not mentioned in the source documents. The explicit prohibition on outside knowledge and the instruction to flag uncertainty significantly reduced hallucination.
+The strictness of this prompt is intentional. Early testing showed the model blending its parametric knowledge with retrieved content. For example, attributing cultural significance to indigenous communities not mentioned in the source documents. The explicit prohibition on outside knowledge and the instruction to flag uncertainty significantly reduced hallucination.
 
 ### Context Injection
 
@@ -167,7 +165,7 @@ Retrieving 4 chunks provides enough context for multi-faceted questions (e.g. "w
 
 The retrieval step embeds the raw user query each turn. Vague follow-up questions like "what threatens them?" are embedded without knowing what "them" refers to, so ChromaDB may retrieve chunks from unrelated species. The LLM can sometimes compensate using conversation history, but retrieval quality degrades for pronoun-heavy follow-ups.
 
-The correct fix is **query contextualization** — rewriting the follow-up as a standalone query before embedding (e.g. rewriting "what threatens them?" to "what threatens polar bears?" using conversation history). This was prototyped but removed because the rewriting step introduced its own failure modes, adding latency and occasionally producing over-verbose queries. Self-contained questions are recommended for best results.
+The correct fix is **query contextualization**. Rewriting the follow-up as a standalone query before embedding (e.g. rewriting "what threatens them?" to "what threatens polar bears?" using conversation history). This was prototyped but removed because the rewriting step introduced its own failure modes, adding latency and occasionally producing over-verbose queries. Self-contained questions are recommended for best results.
 
 ### Broad Inventory Queries
 
@@ -202,19 +200,19 @@ zoo-rag-chatbot/
 
 ### Local vs Cloud LLM
 
-Running entirely locally via Ollama means no API costs, no data privacy concerns, and no network dependency after setup. The tradeoff is that `llama3:8b` is less capable than frontier models on complex reasoning. For a domain-specific retrieval task over well-structured documents this is acceptable — the quality of retrieved context matters more than raw model capability.
+Running entirely locally via Ollama means no API costs, no data privacy concerns, and no network dependency after setup. The tradeoff is that `llama3:8b` is less capable than frontier models on complex reasoning. For a domain-specific retrieval task over well-structured documents this is acceptable. The quality of retrieved context matters more than raw model capability.
 
 ### No LangChain
 
-LangChain was removed in favour of plain Python for document loading and chunking. This reduces the dependency footprint, makes the chunking logic fully explicit and auditable, and avoids abstracting away behaviour that is core to the system's correctness. The only functionality LangChain provided — directory loading and text splitting — was straightforward to reimplement.
+LangChain was removed in favour of plain Python for document loading and chunking. This reduces the dependency footprint, makes the chunking logic fully explicit and auditable, and avoids abstracting away behaviour that is core to the system's correctness. The only functionality LangChain provided was directory loading and text splitting, which was straightforward to reimplement.
 
 ### Multi-turn Conversation
 
-The system maintains conversation history across turns, passing prior exchanges to the LLM alongside fresh retrieved context on each query. This allows the model to answer coherent follow-up questions ("what is being done to protect it?") without the user repeating context. The limitation is that retrieval remains query-based and does not use conversation history to resolve pronouns — see Known Limitations above.
+The system maintains conversation history across turns, passing prior exchanges to the LLM alongside fresh retrieved context on each query. This allows the model to answer coherent follow-up questions ("what is being done to protect it?") without the user repeating context. The limitation is that retrieval remains query-based and does not use conversation history to resolve pronouns. See Known Limitations above.
 
 ### Streaming Output
 
-Responses stream token-by-token to the terminal rather than appearing all at once. This is purely a UX choice — it eliminates the perception of the system hanging during generation and makes the interaction feel more natural.
+Responses stream token-by-token to the terminal rather than appearing all at once. This is purely a UX choice. It eliminates the perception of the system hanging during generation and makes the interaction feel more natural.
 
 ---
 
